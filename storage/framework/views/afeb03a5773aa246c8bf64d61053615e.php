@@ -83,7 +83,7 @@
                             </div>
 
                             <span class="text-xs text-gray-400">
-                                <?php echo e($item->created_at->diffForHumans()); ?>
+                                <?php echo e(optional($item->created_at)->diffForHumans() ?? 'N/A'); ?>
 
                             </span>
 

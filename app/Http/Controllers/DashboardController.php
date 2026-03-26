@@ -12,7 +12,7 @@ class DashboardController extends Controller
         $totalBrands = Item::distinct('brand')->count('brand');
         $latestItems = Item::latest()->take(5)->get();
 
-        // ✅ FIXED: correct range
+        // FIXED: correct range //
         $months = collect(range(0, 5))->map(function ($i) {
             return now()->subMonths($i)->format('M');
         })->reverse()->values();
@@ -30,3 +30,7 @@ class DashboardController extends Controller
         ]);
     }
 }
+
+
+
+

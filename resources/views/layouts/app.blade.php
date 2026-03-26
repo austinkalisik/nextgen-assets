@@ -32,7 +32,7 @@
                 <h2 class="text-xl font-bold tracking-wide text-white">
                     NextGen Assets
                 </h2>
-                <p class="text-xs text-gray-500">Asset Management</p>
+                <p class="text-xs text-gray-500">Inventory System</p>
             </div>
 
             <!-- MENU -->
@@ -43,36 +43,44 @@
 
                 <a href="/dashboard"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    {{ request()->is('dashboard') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                {{ request()->is('dashboard') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
                     Dashboard
                 </a>
 
                 <a href="/items"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    {{ request()->is('items') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
-                    Assets
+                {{ request()->is('items') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                    Products
                 </a>
 
                 <!-- MANAGEMENT -->
                 <p class="mt-6 mb-2 text-xs text-gray-500 uppercase">Management</p>
-            <!-- #region-->
-                {{-- Suppliers --}}
+
+                <!-- Suppliers -->
                 <a href="/suppliers"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                    {{ request()->is('suppliers') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                {{ request()->is('suppliers') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
                     Suppliers
                 </a>
 
-                {{-- SAFE LINKS --}}
+                <!--  NEW: Categories -->
+                <a href="/categories"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition
+                {{ request()->is('categories') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                    Categories
+                </a>
+
+                <!-- Users -->
                 <a href="/users"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    {{ request()->is('users') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                {{ request()->is('users') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
                     Users
                 </a>
 
+                <!-- Settings -->
                 <a href="/settings"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    {{ request()->is('settings') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                {{ request()->is('settings') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
                     Settings
                 </a>
 
@@ -81,7 +89,7 @@
 
                 <a href="/reports"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    {{ request()->is('reports') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                {{ request()->is('reports') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
                     Reports
                 </a>
 
@@ -103,12 +111,29 @@
                 <!-- PAGE TITLE -->
                 <div>
                     <h1 class="text-lg font-semibold text-slate-800">
-                        @if(request()->is('items')) Assets Management
-                        @elseif(request()->is('users')) Users Management
-                        @elseif(request()->is('settings')) Settings
-                        @elseif(request()->is('reports')) Reports
-                        @else Dashboard Overview
+
+                        @if(request()->is('items'))
+                            Products Management
+
+                        @elseif(request()->is('categories'))
+                            Categories Management
+
+                        @elseif(request()->is('suppliers'))
+                            Suppliers Management
+
+                        @elseif(request()->is('users'))
+                            Users Management
+
+                        @elseif(request()->is('settings'))
+                            Settings
+
+                        @elseif(request()->is('reports'))
+                            Reports
+
+                        @else
+                            Dashboard Overview
                         @endif
+
                     </h1>
 
                     <p class="text-xs text-gray-500">
@@ -125,7 +150,7 @@
                         </span>
                     </div>
 
-                    <!-- SAFE LOGOUT -->
+                    <!-- LOGOUT -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600">

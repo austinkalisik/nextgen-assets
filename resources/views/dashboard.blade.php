@@ -72,7 +72,7 @@
                             </div>
 
                             <span class="text-xs text-gray-400">
-                                {{ $item->created_at->diffForHumans() }}
+                                {{ optional($item->created_at)->diffForHumans() ?? 'N/A' }}
                             </span>
 
                         </div>

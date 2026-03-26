@@ -1,6 +1,6 @@
 # NextGen Assets Inventory System
 
-A modern **Sales & Inventory Management System** built with Laravel.
+A modern Sales & Inventory Management System built with Laravel.
 
 This system helps manage:
 

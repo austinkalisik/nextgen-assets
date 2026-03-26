@@ -5,7 +5,9 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\CategoryController; // ✅ FIX ADDED
+use App\Http\Controllers\CategoryController; // FIX ADDED
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SettingController;
 
 Route::get('/', function () {
     return redirect('/dashboard');
@@ -21,6 +23,12 @@ Route::middleware(['auth'])->group(function () {
      * =============================
      */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // CUSTOMERS
+    Route::get('/customers', [CustomerController::class, 'index'])->name('customers');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+    Route::delete('/customers/{id}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+
 
     /**
      * =============================
@@ -55,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
      * USERS
      * =============================
      */
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
@@ -65,13 +74,10 @@ Route::middleware(['auth'])->group(function () {
      * SETTINGS
      * =============================
      */
-    Route::get('/settings', function () {
-        return view('settings');
-    })->name('settings');
+    // SETTINGS
+Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
-    Route::post('/settings', function () {
-        return back()->with('success', 'Settings saved successfully!');
-    });
 
     /**
      * =============================

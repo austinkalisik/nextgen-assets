@@ -60,7 +60,7 @@
             <div class="space-y-3">
 
                 <?php $__currentLoopData = \App\Models\Item::latest()->take(5)->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50">
 
                         <div>
                             <p class="font-medium text-gray-800">
@@ -74,7 +74,7 @@
                         </div>
 
                         <span class="text-xs text-gray-400">
-                            <?php echo e($item->created_at->diffForHumans()); ?>
+                        <?php echo e(optional($item->created_at)->diffForHumans() ?? 'N/A'); ?>
 
                         </span>
 

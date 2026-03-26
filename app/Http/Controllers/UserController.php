@@ -4,31 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     /**
      * =============================
-     * SHOW ALL USERS
+     * DISPLAY USERS + SEARCH
      * =============================
      */
     public function index(Request $request)
     {
         $query = User::query();
 
-        if ($request->search) {
-            $query->where('name', 'like', '%' . $request->search . '%')
+        // SAFE SEARCH (grouped)
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $users = $query->latest()->paginate(10);
+        $users = $query->latest()
+                       ->paginate(10)
+                       ->withQueryString();
 
         return view('users', compact('users'));
     }
 
     /**
      * =============================
-     * SHOW EDIT PAGE
+     * STORE NEW USER
+     * =============================
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect()->route('users')
+            ->with('success', 'User created successfully');
+    }
+
+    /**
+     * =============================
+     * EDIT USER
      * =============================
      */
     public function edit($id)
@@ -47,17 +76,15 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'email' => 'required|email|max:255',
         ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+        $user->update($validated);
 
-        return redirect('/users')->with('success', 'User updated successfully');
+        return redirect()->route('users')
+            ->with('success', 'User updated successfully');
     }
 
     /**
@@ -72,5 +99,3 @@ class UserController extends Controller
         return back()->with('success', 'User deleted successfully');
     }
 }
-
-

@@ -32,7 +32,7 @@
                 <h2 class="text-xl font-bold tracking-wide text-white">
                     NextGen Assets
                 </h2>
-                <p class="text-xs text-gray-500">Asset Management</p>
+                <p class="text-xs text-gray-500">Inventory System</p>
             </div>
 
             <!-- MENU -->
@@ -43,36 +43,44 @@
 
                 <a href="/dashboard"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    <?php echo e(request()->is('dashboard') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                <?php echo e(request()->is('dashboard') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
                     Dashboard
                 </a>
 
                 <a href="/items"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    <?php echo e(request()->is('items') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
-                    Assets
+                <?php echo e(request()->is('items') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                    Products
                 </a>
 
                 <!-- MANAGEMENT -->
                 <p class="mt-6 mb-2 text-xs text-gray-500 uppercase">Management</p>
-            <!-- #region-->
-                
+
+                <!-- Suppliers -->
                 <a href="/suppliers"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                    <?php echo e(request()->is('suppliers') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                <?php echo e(request()->is('suppliers') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
                     Suppliers
                 </a>
 
-                
+                <!--  NEW: Categories -->
+                <a href="/categories"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg transition
+                <?php echo e(request()->is('categories') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                    Categories
+                </a>
+
+                <!-- Users -->
                 <a href="/users"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    <?php echo e(request()->is('users') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                <?php echo e(request()->is('users') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
                     Users
                 </a>
 
+                <!-- Settings -->
                 <a href="/settings"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    <?php echo e(request()->is('settings') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                <?php echo e(request()->is('settings') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
                     Settings
                 </a>
 
@@ -81,7 +89,7 @@
 
                 <a href="/reports"
                     class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                    <?php echo e(request()->is('reports') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
+                <?php echo e(request()->is('reports') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white'); ?>">
                     Reports
                 </a>
 
@@ -103,12 +111,29 @@
                 <!-- PAGE TITLE -->
                 <div>
                     <h1 class="text-lg font-semibold text-slate-800">
-                        <?php if(request()->is('items')): ?> Assets Management
-                        <?php elseif(request()->is('users')): ?> Users Management
-                        <?php elseif(request()->is('settings')): ?> Settings
-                        <?php elseif(request()->is('reports')): ?> Reports
-                        <?php else: ?> Dashboard Overview
+
+                        <?php if(request()->is('items')): ?>
+                            Products Management
+
+                        <?php elseif(request()->is('categories')): ?>
+                            Categories Management
+
+                        <?php elseif(request()->is('suppliers')): ?>
+                            Suppliers Management
+
+                        <?php elseif(request()->is('users')): ?>
+                            Users Management
+
+                        <?php elseif(request()->is('settings')): ?>
+                            Settings
+
+                        <?php elseif(request()->is('reports')): ?>
+                            Reports
+
+                        <?php else: ?>
+                            Dashboard Overview
                         <?php endif; ?>
+
                     </h1>
 
                     <p class="text-xs text-gray-500">
@@ -127,7 +152,7 @@
                         </span>
                     </div>
 
-                    <!-- SAFE LOGOUT -->
+                    <!-- LOGOUT -->
                     <form method="POST" action="<?php echo e(route('logout')); ?>">
                         <?php echo csrf_field(); ?>
                         <button class="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600">

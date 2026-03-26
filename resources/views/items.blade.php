@@ -1,68 +1,85 @@
 <x-app-layout>
 
-    <div class="space-y-10">
+    <div class="space-y-8">
 
-        <!-- ============================= -->
         <!-- HEADER -->
-        <!-- ============================= -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-800">
-                    Products Management
-                </h1>
-                <p class="text-sm text-gray-500">
-                    Add, manage, and track all your products efficiently
-                </p>
-            </div>
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Products Management</h1>
+            <p class="text-sm text-gray-500">Manage your inventory efficiently</p>
         </div>
 
-        <!-- ============================= -->
-        <!-- ADD PRODUCT FORM -->
-        <!-- ============================= -->
-        <div class="max-w-6xl p-6 bg-white border shadow-lg rounded-2xl">
+        <!-- SUCCESS -->
+        @if(session('success'))
+            <div class="p-4 text-green-700 bg-green-100 rounded-lg">
+                {{ session('success') }}
+            </div>
+        @endif
 
-            <form method="POST" action="{{ route('items.store') }}" class="grid grid-cols-1 gap-4 md:grid-cols-5">
+        <!-- ERRORS -->
+        @if ($errors->any())
+            <div class="p-4 text-red-700 bg-red-100 rounded-lg">
+                @foreach ($errors->all() as $error)
+                    <div>• {{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
+
+        <!-- SEARCH + ADD -->
+        <div class="p-6 space-y-4 bg-white border shadow rounded-xl">
+
+            <!-- SEARCH -->
+            <form method="GET" action="{{ route('items') }}" class="flex gap-2">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
+                    class="w-full px-4 py-2 border rounded-lg">
+
+                <button class="px-4 py-2 text-white bg-blue-600 rounded-lg">
+                    Search
+                </button>
+            </form>
+
+            <!-- ADD PRODUCT -->
+            <form method="POST" action="{{ route('items.store') }}" class="grid grid-cols-1 gap-3 md:grid-cols-5">
                 @csrf
 
-                <!-- Product Code -->
-                <input name="part_no" placeholder="Product Code" required
-                    class="px-4 py-3 text-sm border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
+                <input name="part_no" placeholder="Code" class="px-3 py-2 border rounded-lg" required>
+                <input name="brand" placeholder="Brand" class="px-3 py-2 border rounded-lg" required>
+                <input name="part_name" placeholder="Name" class="px-3 py-2 border rounded-lg" required>
+                <input name="description" placeholder="Description" class="px-3 py-2 border rounded-lg" required>
 
-                <!-- Brand -->
-                <input name="brand" placeholder="Brand" required
-                    class="px-4 py-3 text-sm border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
-
-                <!-- Product Name -->
-                <input name="part_name" placeholder="Product Name" required
-                    class="px-4 py-3 text-sm border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
-
-                <!-- Description -->
-                <input name="description" placeholder="Description" required
-                    class="px-4 py-3 text-sm border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
-
-                <!-- Submit -->
-                <button
-                    class="px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700">
-                    + Add Product
+                <button class="text-white bg-green-600 rounded-lg hover:bg-green-700">
+                    + Add
                 </button>
             </form>
 
         </div>
 
-        <!-- ============================= -->
-        <!-- PRODUCTS TABLE -->
-        <!-- ============================= -->
-        <div class="overflow-hidden bg-white border shadow-lg rounded-2xl">
+        <!-- TABLE -->
+        <div class="overflow-hidden bg-white border shadow rounded-2xl">
 
-            <!-- TABLE HEADER -->
-            <div class="flex items-center justify-between px-6 py-4 border-b bg-slate-50">
+            <!-- HEADER -->
+            <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b bg-slate-50">
+
                 <h3 class="font-semibold text-gray-700">All Products</h3>
+
+                <!-- FILTER -->
+                <form method="GET" action="{{ route('items') }}" class="flex gap-2">
+
+                    <input type="text" name="part_no" value="{{ request('part_no') }}" placeholder="Filter by Code"
+                        class="px-3 py-2 text-sm border rounded-lg">
+
+                    <button class="px-4 py-2 text-white bg-gray-700 rounded-lg">
+                        Filter
+                    </button>
+
+                </form>
 
                 <span class="text-sm text-gray-400">
                     {{ $items->total() }} total
                 </span>
+
             </div>
 
+            <!-- TABLE -->
             <table class="w-full text-sm">
                 <thead class="text-xs text-gray-600 uppercase bg-slate-50">
                     <tr>
@@ -75,75 +92,51 @@
                 </thead>
 
                 <tbody class="divide-y">
-
                     @forelse($items as $item)
-                                    <tr class="transition hover:bg-slate-50">
+                        <tr class="hover:bg-slate-50">
 
-                                        <!-- INLINE EDIT FORM -->
-                                        <form method="POST" action="{{ route('items.update', $item->id) }}">
-                                            @csrf
-                                            @method('PUT')
+                            <td class="px-6 py-4">{{ $item->part_no }}</td>
+                            <td class="px-6 py-4">{{ $item->brand }}</td>
+                            <td class="px-6 py-4">{{ $item->part_name }}</td>
+                            <td class="px-6 py-4 text-gray-500">{{ $item->description }}</td>
 
-                                            <td class="px-6 py-4">
-                                                <input name="part_no" value="{{ $item->part_no }}"
-                                                    class="w-full px-2 py-1 text-sm border rounded">
-                                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex justify-center gap-2">
 
-                                            <td class="px-6 py-4">
-                                                <input name="brand" value="{{ $item->brand }}"
-                                                    class="w-full px-2 py-1 text-sm border rounded">
-                                            </td>
+                                    <a href="#" class="px-3 py-1 text-xs text-white bg-blue-500 rounded-lg">
+                                        Edit
+                                    </a>
 
-                                            <td class="px-6 py-4">
-                                                <input name="part_name" value="{{ $item->part_name }}"
-                                                    class="w-full px-2 py-1 text-sm border rounded">
-                                            </td>
+                                    <form method="POST" action="{{ route('items.destroy', $item->id) }}">
+                                        @csrf
+                                        @method('DELETE')
 
-                                            <td class="px-6 py-4">
-                                                <input name="description" value="{{ $item->description }}"
-                                                    class="w-full px-2 py-1 text-sm border rounded">
-                                            </td>
+                                        <button onclick="return confirm('Delete this product?')"
+                                            class="px-3 py-1 text-xs text-white bg-red-500 rounded-lg">
+                                            Delete
+                                        </button>
+                                    </form>
 
-                                            <!-- ACTIONS -->
-                                            <td class="px-6 py-4 text-center">
-                                                <div class="flex justify-center gap-2">
-
-                                                    <!-- SAVE -->
-                                                    <button
-                                                        class="px-3 py-1 text-xs font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600">
-                                                        Save
-                                                    </button>
-                                        </form>
-
-                                        <!-- DELETE -->
-                                        <form method="POST" action="{{ route('items.destroy', $item->id) }}">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button onclick="return confirm('Delete this product?')"
-                                                class="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600">
-                                                Delete
-                                            </button>
-                                        </form>
-
-                        </div>
-                        </td>
+                                </div>
+                            </td>
 
                         </tr>
-
                     @empty
-            <tr>
-                <td colspan="5" class="py-12 text-center text-gray-400">
-                    No products found
-                </td>
-            </tr>
-        @endforelse
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-gray-400">
+                                No products found
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
 
-        </tbody>
+            <!-- PAGINATION -->
+            <div class="p-4">
+                {{ $items->links() }}
+            </div>
 
-        </table>
-
-    </div>
+        </div>
 
     </div>
 

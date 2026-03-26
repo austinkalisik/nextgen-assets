@@ -9,13 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+   public function up(): void
+{
+    Schema::create('categories', function (Blueprint $table) {
+        $table->id();
+
+        // Category name (e.g. Electronics, Furniture)
+        $table->string('name');  //Required
+
+        // Optional description
+        $table->string('description')->nullable();  //Optional
+
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

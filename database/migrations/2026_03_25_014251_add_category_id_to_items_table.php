@@ -9,13 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('items', function (Blueprint $table) {
-            //
-        });
-    }
-
+public function up()
+{
+    Schema::table('items', function (Blueprint $table) {
+        $table->foreignId('category_id')
+              ->nullable()
+              ->constrained()
+              ->onDelete('set null');
+    });
+}
     /**
      * Reverse the migrations.
      */

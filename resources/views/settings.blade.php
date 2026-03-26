@@ -1,3 +1,9 @@
+@if(session('success'))
+    <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">
+        {{ session('success') }}
+    </div>
+@endif
+
 <x-app-layout>
 
     <div class="space-y-8">
@@ -23,28 +29,18 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('settings') }}">
+            <form method="POST" action="{{ route('settings.store') }}">
                 @csrf
 
                 <div class="space-y-5">
+<!-- APP NAME -->
+<input type="text" name="app_name" value="{{ old('app_name', session()->get('app_name') ?? 'NextGen Assets') }}"
+    class="w-full px-4 py-2 border rounded-lg bg-gray-50">
 
-                    <!-- APP NAME -->
-                    <div>
-                        <label class="block mb-1 text-sm font-medium text-gray-600">
-                            Application Name
-                        </label>
-                        <input type="text" value="NextGen Assets" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                    </div>
-
-                    <!-- EMAIL -->
-                    <div>
-                        <label class="block mb-1 text-sm font-medium text-gray-600">
-                            Admin Email
-                        </label>
-                        <input type="email" value="{{ Auth::user()->email }}"
-                            class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                    </div>
-
+<!-- EMAIL -->
+<input type="email" name="admin_email"
+    value="{{ old('admin_email', session()->get('admin_email') ?? Auth::user()->email) }}"
+    class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                     <!-- STATUS -->
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600">System Status</span>

@@ -2,33 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Supplier;
 use Illuminate\Http\Request;
+use App\Models\Supplier;
 
 class SupplierController extends Controller
 {
-    // SHOW PAGE
-    public function index()
+    /**
+     * =============================
+     * DISPLAY SUPPLIERS + SEARCH + FILTER
+     * =============================
+     */
+    public function index(Request $request)
     {
-        $suppliers = Supplier::latest()->get();
+        $query = Supplier::query();
+
+        // GLOBAL SEARCH (SAFE GROUPING)
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // FILTER: NAME
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        // FILTER: EMAIL
+        if ($request->filled('email')) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
+
+        // LOAD ITEMS COUNT (for future dashboard stats)
+        $suppliers = $query->withCount('items')
+                           ->latest()
+                           ->paginate(10)
+                           ->withQueryString();
+
         return view('suppliers', compact('suppliers'));
     }
 
-    // STORE DATA
+    /**
+     * =============================
+     * STORE NEW SUPPLIER
+     * =============================
+     */
     public function store(Request $request)
     {
-        Supplier::create([
-            'name' => $request->name,
-            'email' => $request->email,
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
         ]);
 
-        return back()->with('success', 'Supplier added');
+        Supplier::create($validated);
+
+        return redirect()->route('suppliers')
+            ->with('success', 'Supplier added successfully');
     }
 
-    // DELETE
+    /**
+     * =============================
+     * DELETE SUPPLIER
+     * =============================
+     */
     public function destroy($id)
     {
         Supplier::findOrFail($id)->delete();
-        return back()->with('success', 'Deleted');
+
+        return back()->with('success', 'Supplier deleted successfully');
     }
 }
