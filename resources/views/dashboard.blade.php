@@ -2,23 +2,13 @@
 
     <div class="space-y-8">
 
-        <!-- ============================= -->
-        <!-- HEADER + GREETING -->
-        <!-- ============================= -->
+        <!-- HEADER -->
         <div class="flex items-center justify-between">
 
             <div>
-                <!-- Dynamic Greeting -->
                 @php
                     $hour = now()->format('H');
-
-                    if ($hour < 12) {
-                        $greeting = 'Good Morning ';
-                    } elseif ($hour < 18) {
-                        $greeting = 'Good Afternoon ';
-                    } else {
-                        $greeting = 'Good Evening ';
-                    }
+                    $greeting = $hour < 12 ? 'Good Morning' : ($hour < 18 ? 'Good Afternoon' : 'Good Evening');
                 @endphp
 
                 <h1 class="text-3xl font-bold text-slate-800">
@@ -26,163 +16,147 @@
                 </h1>
 
                 <p class="text-sm text-gray-500">
-                    Here’s what’s happening in your system today
+                    Asset overview and system activity
                 </p>
             </div>
 
-            <!-- Quick Action -->
-            <a href="/products"
-                class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700">
-                + Add Asset
-            </a>
+            <!-- SEARCH -->
+            <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
+
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search assets..."
+                    class="w-64 px-4 py-2 border rounded-lg">
+
+                <button class="px-4 py-2 text-white bg-blue-600 rounded-lg">
+                    Search
+                </button>
+
+            </form>
 
         </div>
 
-        <!-- ============================= -->
-        <!-- SEARCH BAR -->
-        <!-- ============================= -->
-        <div class="p-4 bg-white shadow rounded-xl">
-            <input type="text" placeholder="Search products, suppliers, users..."
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
+        <!-- ALERTS -->
+        @if($lowStockAssets > 0)
+            <div class="p-4 text-yellow-800 bg-yellow-100 rounded-lg">
+                ⚠️ {{ $lowStockAssets }} assets are low in stock
+            </div>
+        @endif
 
-        <!-- ============================= -->
         <!-- STATS -->
-        <!-- ============================= -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
 
-            <div class="p-6 text-white shadow-lg rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700">
-                <p class="text-sm opacity-80">Total Assets</p>
-                <h2 class="text-3xl font-bold">{{ $totalProducts }}</h2>
+            <div class="p-6 text-white bg-blue-600 shadow rounded-xl">
+                <p class="text-sm">Total Assets</p>
+                <h2 class="text-3xl font-bold">{{ $totalAssets }}</h2>
             </div>
 
-            <div class="p-6 text-white shadow-lg rounded-2xl bg-gradient-to-r from-purple-500 to-purple-700">
-                <p class="text-sm opacity-80">Total Brands</p>
-                <h2 class="text-3xl font-bold">{{ $totalBrands }}</h2>
+            <div class="p-6 text-white bg-green-600 shadow rounded-xl">
+                <p class="text-sm">Available</p>
+                <h2 class="text-3xl font-bold">{{ $availableAssets }}</h2>
             </div>
 
-            <div class="p-6 text-white shadow-lg rounded-2xl bg-gradient-to-r from-green-500 to-green-700">
-                <p class="text-sm opacity-80">Recently Added</p>
-                <h2 class="text-3xl font-bold">{{ $latestProducts->count() }}</h2>
+            <div class="p-6 text-white bg-yellow-500 shadow rounded-xl">
+                <p class="text-sm">Assigned</p>
+                <h2 class="text-3xl font-bold">{{ $assignedAssets }}</h2>
+            </div>
+
+            <div class="p-6 text-white bg-red-500 shadow rounded-xl">
+                <p class="text-sm">Maintenance</p>
+                <h2 class="text-3xl font-bold">{{ $maintenanceAssets }}</h2>
             </div>
 
         </div>
 
-        <!-- ============================= -->
         <!-- MAIN GRID -->
-        <!-- ============================= -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-            <!-- ============================= -->
-            <!-- RECENT PRODUCTS -->
-            <!-- ============================= -->
-            <div class="p-6 bg-white shadow-lg lg:col-span-2 rounded-2xl">
+            <!-- RECENT ASSETS -->
+            <div class="p-6 bg-white shadow rounded-xl lg:col-span-2">
 
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-gray-700">
-                        Recent Assets
-                    </h3>
+                    <h3 class="font-semibold text-gray-700">Recent Assets</h3>
 
-                    <a href="/products" class="text-sm text-blue-500 hover:underline">
+                    <a href="{{ route('assets') }}" class="text-sm text-blue-500 hover:underline">
                         View all →
                     </a>
                 </div>
 
-                <div class="space-y-3">
+                <table class="w-full text-sm">
+                    <thead class="text-left text-gray-500 border-b">
+                        <tr>
+                            <th>Name</th>
+                            <th>Brand</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
 
-                    @forelse($latestProducts as $product)
-                        <div
-                            class="flex items-center justify-between p-4 transition rounded-lg bg-slate-50 hover:bg-slate-100">
+                    <tbody>
+                        @forelse($latestAssets as $asset)
+                            <tr class="border-b hover:bg-gray-50">
 
-                            <div>
-                                <p class="font-medium text-gray-800">
-                                    {{ $product->part_name }}
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    {{ $product->brand }}
-                                </p>
-                            </div>
+                                <td class="py-3">{{ $asset->part_name }}</td>
+                                <td class="py-3">{{ $asset->brand }}</td>
 
-                            <span class="text-xs text-gray-400">
-                                {{ optional($product->created_at)->diffForHumans() ?? 'N/A' }}
-                            </span>
+                                <td class="py-3">
+                                    <span class="px-2 py-1 text-xs rounded
+                                        @if($asset->status == 'available') bg-green-100 text-green-600
+                                        @elseif($asset->status == 'assigned') bg-yellow-100 text-yellow-600
+                                        @elseif($asset->status == 'maintenance') bg-red-100 text-red-600
+                                        @endif
+                                    ">
+                                        {{ ucfirst($asset->status) }}
+                                    </span>
+                                </td>
 
-                        </div>
-                    @empty
-                        <div class="py-6 text-center text-gray-400">
-                            No recent assets found
-                        </div>
-                    @endforelse
+                                <td class="py-3 text-gray-400">
+                                    {{ optional($asset->created_at)->diffForHumans() }}
+                                </td>
 
-                </div>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-6 text-center text-gray-400">
+                                    No assets found
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
 
             </div>
 
-            <!-- ============================= -->
-            <!-- RIGHT PANEL -->
-            <!-- ============================= -->
+            <!-- SIDE PANEL -->
             <div class="space-y-6">
 
-                <!-- SYSTEM SUMMARY -->
-                <div class="p-6 bg-white shadow-lg rounded-2xl">
+                <!-- SUMMARY -->
+                <div class="p-6 bg-white shadow rounded-xl">
+                    <h3 class="mb-4 font-semibold text-gray-700">System Summary</h3>
 
-                    <h3 class="mb-4 font-semibold text-gray-700">
-                        System Summary
-                    </h3>
-
-                    <div class="space-y-3 text-sm">
-
+                    <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span>Total Assets</span>
-                            <span class="font-semibold">{{ $totalProducts }}</span>
+                            <span class="font-semibold">{{ $totalAssets }}</span>
                         </div>
-
                         <div class="flex justify-between">
-                            <span>Brands</span>
-                            <span class="font-semibold">{{ $totalBrands }}</span>
+                            <span>Suppliers</span>
+                            <span class="font-semibold">{{ $totalSuppliers }}</span>
                         </div>
-
                         <div class="flex justify-between">
-                            <span>Status</span>
-                            <span class="font-semibold text-green-500">Active</span>
+                            <span>Categories</span>
+                            <span class="font-semibold">{{ $totalCategories }}</span>
                         </div>
-
                     </div>
-
                 </div>
 
-                <!-- ============================= -->
-                <!-- NOTIFICATIONS -->
-                <!-- ============================= -->
-                <div class="p-6 bg-white shadow-lg rounded-2xl">
+                <!-- MONTHLY INSIGHT -->
+                <div class="p-6 bg-white shadow rounded-xl">
+                    <h3 class="mb-4 font-semibold text-gray-700">Monthly Activity</h3>
 
-                    <h3 class="mb-4 font-semibold text-gray-700">
-                        Notifications
-                    </h3>
-
-                    <div class="space-y-3 text-sm text-gray-600">
-
-                        <div> {{ $latestProducts->count() }} new assets added</div>
-                        <div> {{ \App\Models\User::count() }} users in system</div>
-                        <div> {{ \App\Models\Supplier::count() }} suppliers registered</div>
-
-                    </div>
-
-                </div>
-
-                <!-- ACTIONS -->
-                <div class="space-y-2">
-
-                    <a href="/products"
-                        class="block w-full px-4 py-2 text-sm text-center rounded-lg bg-slate-100 hover:bg-slate-200">
-                        Manage Assets
-                    </a>
-
-                    <a href="/settings"
-                        class="block w-full px-4 py-2 text-sm text-center rounded-lg bg-slate-100 hover:bg-slate-200">
-                        Settings
-                    </a>
-
+                    <ul class="space-y-1 text-sm text-gray-600">
+                        @foreach($monthlyAssets as $month => $count)
+                            <li>Month {{ $month + 1 }}: {{ $count }} assets</li>
+                        @endforeach
+                    </ul>
                 </div>
 
             </div>

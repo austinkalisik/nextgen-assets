@@ -8,16 +8,10 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * =============================
-     * DISPLAY USERS + SEARCH
-     * =============================
-     */
     public function index(Request $request)
     {
         $query = User::query();
 
-        // SAFE SEARCH (grouped)
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
@@ -25,18 +19,11 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->latest()
-                       ->paginate(10)
-                       ->withQueryString();
+        $users = $query->latest()->paginate(10);
 
         return view('users', compact('users'));
     }
 
-    /**
-     * =============================
-     * STORE NEW USER
-     * =============================
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,27 +38,17 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect()->route('users')
-            ->with('success', 'User created successfully');
+        return redirect()->route('users')->with('success', 'User created');
     }
 
-    /**
-     * =============================
-     * EDIT USER
-     * =============================
-     */
+    // 🔥 FIXED EDIT (NO CRASH)
     public function edit($id)
     {
         $user = User::findOrFail($id);
 
-        return view('users.edit', compact('user'));
+        return view('users_edit', compact('user'));
     }
 
-    /**
-     * =============================
-     * UPDATE USER
-     * =============================
-     */
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -83,19 +60,13 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('users')
-            ->with('success', 'User updated successfully');
+        return redirect()->route('users')->with('success', 'User updated');
     }
 
-    /**
-     * =============================
-     * DELETE USER
-     * =============================
-     */
     public function destroy($id)
     {
         User::findOrFail($id)->delete();
 
-        return back()->with('success', 'User deleted successfully');
+        return back()->with('success', 'User deleted');
     }
 }

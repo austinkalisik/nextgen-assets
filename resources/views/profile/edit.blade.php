@@ -1,29 +1,29 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
+    <div class="max-w-xl mx-auto p-6 bg-white shadow rounded-xl mt-6">
+
+        <h2 class="text-xl font-bold mb-4">Edit User</h2>
+
+        <form method="POST" action="{{ route('users.update', $user->id) }}">
+            @csrf
+            @method('PUT')
+
+            <div class="mb-4">
+                <label class="block text-sm">Name</label>
+                <input type="text" name="name" value="{{ $user->name }}" class="w-full border rounded px-3 py-2">
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
+            <div class="mb-4">
+                <label class="block text-sm">Email</label>
+                <input type="email" name="email" value="{{ $user->email }}" class="w-full border rounded px-3 py-2">
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded">
+                Update User
+            </button>
+
+        </form>
+
     </div>
+
 </x-app-layout>

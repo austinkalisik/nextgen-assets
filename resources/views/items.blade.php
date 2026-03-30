@@ -3,137 +3,151 @@
     <div class="space-y-8">
 
         <!-- HEADER -->
-        <div>
-            <h1 class="text-3xl font-bold text-slate-800">Products Management</h1>
-            <p class="text-sm text-gray-500">Manage your inventory efficiently</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Asset Management</h1>
+                <p class="text-sm text-gray-500">Manage and track all company assets</p>
+            </div>
         </div>
 
-        <!-- SUCCESS -->
-        @if(session('success'))
-            <div class="p-4 text-green-700 bg-green-100 rounded-lg">
-                {{ session('success') }}
-            </div>
-        @endif
+        <!-- TABLE CARD -->
+        <div class="overflow-hidden bg-white border shadow-lg rounded-2xl">
 
-        <!-- ERRORS -->
-        @if ($errors->any())
-            <div class="p-4 text-red-700 bg-red-100 rounded-lg">
-                @foreach ($errors->all() as $error)
-                    <div>• {{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
-
-        <!-- SEARCH + ADD -->
-        <div class="p-6 space-y-4 bg-white border shadow rounded-xl">
-
-            <!-- SEARCH -->
-            <form method="GET" action="{{ route('products') }}" class="flex gap-2">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products..."
-                    class="w-full px-4 py-2 border rounded-lg">
-
-                <button class="px-4 py-2 text-white bg-blue-600 rounded-lg">
-                    Search
-                </button>
-            </form>
-
-            <!-- ADD PRODUCT -->
-            <form method="POST" action="{{ route('products.store') }}" class="grid grid-cols-1 gap-3 md:grid-cols-5">
-                @csrf
-
-                <input name="part_no" placeholder="Code" class="px-3 py-2 border rounded-lg" required>
-                <input name="brand" placeholder="Brand" class="px-3 py-2 border rounded-lg" required>
-                <input name="part_name" placeholder="Name" class="px-3 py-2 border rounded-lg" required>
-                <input name="description" placeholder="Description" class="px-3 py-2 border rounded-lg" required>
-
-                <button class="text-white bg-green-600 rounded-lg hover:bg-green-700">
-                    + Add
-                </button>
-            </form>
-
-        </div>
-
-        <!-- TABLE -->
-        <div class="overflow-hidden bg-white border shadow rounded-2xl">
-
-            <!-- HEADER -->
-            <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b bg-slate-50">
-
-                <h3 class="font-semibold text-gray-700">All Products</h3>
-
-                <!-- FILTER -->
-                <form method="GET" action="{{ route('products') }}" class="flex gap-2">
-
-                    <input type="text" name="part_no" value="{{ request('part_no') }}" placeholder="Filter by Code"
-                        class="px-3 py-2 text-sm border rounded-lg">
-
-                    <button class="px-4 py-2 text-white bg-gray-700 rounded-lg">
-                        Filter
-                    </button>
-
-                </form>
-
-                <span class="text-sm text-gray-400">
-                    {{ $items->total() }} total
-                </span>
-
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-slate-50">
+                <h3 class="font-semibold text-gray-700">All Assets</h3>
+                <span class="text-sm text-gray-400">Total: {{ $items->count() }}</span>
             </div>
 
-            <!-- TABLE -->
             <table class="w-full text-sm">
-                <thead class="text-xs text-gray-600 uppercase bg-slate-50">
+                <thead class="text-xs text-gray-500 uppercase bg-slate-50">
                     <tr>
                         <th class="px-6 py-4 text-left">Code</th>
                         <th class="px-6 py-4 text-left">Brand</th>
                         <th class="px-6 py-4 text-left">Name</th>
-                        <th class="px-6 py-4 text-left">Description</th>
-                        <th class="px-6 py-4 text-center">Actions</th>
+                        <th class="px-6 py-4 text-left">Assigned</th>
+                        <th class="px-6 py-4 text-left">Status</th>
+                        <th class="px-6 py-4 text-left">Actions</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y">
-                    @forelse($items as $item)
-                        <tr class="hover:bg-slate-50">
 
-                            <td class="px-6 py-4">{{ $item->part_no }}</td>
+                    @foreach($items as $item)
+                        <tr class="transition hover:bg-slate-50">
+
+                            <td class="px-6 py-4 font-medium">{{ $item->part_no }}</td>
                             <td class="px-6 py-4">{{ $item->brand }}</td>
                             <td class="px-6 py-4">{{ $item->part_name }}</td>
-                            <td class="px-6 py-4 text-gray-500">{{ $item->description }}</td>
 
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex justify-center gap-2">
+                            <td class="px-6 py-4 text-gray-500">
+                                {{ $item->user->name ?? '-' }}
+                            </td>
 
-                                    <a href="#" class="px-3 py-1 text-xs text-white bg-blue-500 rounded-lg">
-                                        Edit
-                                    </a>
+                            <!-- STATUS BADGE -->
+                            <td class="px-6 py-4">
+                                @php $status = $item->status ?? 'available'; @endphp
 
-                                    <form method="POST" action="{{ route('products.destroy', $item->id) }}">
-                                        @csrf
-                                        @method('DELETE')
+                                <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {{ $status == 'available' ? 'bg-green-100 text-green-700' : '' }}
+                                {{ $status == 'assigned' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                {{ $status == 'maintenance' ? 'bg-red-100 text-red-700' : '' }}">
+                                    {{ ucfirst($status) }}
+                                </span>
+                            </td>
 
-                                        <button onclick="return confirm('Delete this product?')"
-                                            class="px-3 py-1 text-xs text-white bg-red-500 rounded-lg">
-                                            Delete
-                                        </button>
-                                    </form>
+                            <!-- ACTIONS -->
+                            <td class="px-6 py-4">
 
-                                </div>
+                                <form method="POST" action="{{ route('assets.update', $item->id) }}"
+                                    class="flex items-center gap-2">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <!-- USER -->
+                                    <select name="assigned_to"
+                                        class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Assign</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" {{ $item->assigned_to == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    <!-- STATUS -->
+                                    <select name="status"
+                                        class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="available" {{ $item->status == 'available' ? 'selected' : '' }}>
+                                            Available</option>
+                                        <option value="assigned" {{ $item->status == 'assigned' ? 'selected' : '' }}>Assigned
+                                        </option>
+                                        <option value="maintenance" {{ $item->status == 'maintenance' ? 'selected' : '' }}>
+                                            Maintenance</option>
+                                    </select>
+
+                                    <!-- SAVE BUTTON -->
+                                    <button class="px-3 py-1 text-xs text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                                        Save
+                                    </button>
+                                </form>
+
                             </td>
 
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="py-10 text-center text-gray-400">
-                                No products found
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
+
                 </tbody>
             </table>
 
-            <!-- PAGINATION -->
-            <div class="p-4">
-                {{ $items->links() }}
+        </div>
+
+        <!-- ACTIVITY LOG -->
+        <div class="p-6 bg-white border shadow-lg rounded-2xl">
+
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Activity Log</h3>
+                <span class="text-xs text-gray-400">Latest actions</span>
+            </div>
+
+            <div class="space-y-3 text-sm">
+
+                @forelse($logs as $log)
+                    <div class="flex items-center justify-between p-3 transition rounded-lg bg-slate-50 hover:bg-slate-100">
+
+                        <div class="flex items-center gap-2">
+
+                            <!-- ACTION BADGE -->
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {{ $log->action == 'created' ? 'bg-green-100 text-green-700' : '' }}
+                                {{ $log->action == 'updated' ? 'bg-blue-100 text-blue-700' : '' }}
+                                {{ $log->action == 'deleted' ? 'bg-red-100 text-red-700' : '' }}">
+                                {{ ucfirst($log->action) }}
+                            </span>
+
+                            <!-- TEXT -->
+                            <span class="text-gray-700">
+                                {{ optional($log->item)->part_name ?? 'Asset' }}
+                            </span>
+
+                            <span class="text-gray-500">
+                                by {{ optional($log->user)->name ?? 'System' }}
+                            </span>
+
+                        </div>
+
+                        <!-- TIME -->
+                        <span class="text-xs text-gray-400">
+                            {{ $log->created_at?->diffForHumans() }}
+                        </span>
+
+                    </div>
+
+                @empty
+                    <div class="py-6 text-center text-gray-400">
+                        No activity yet
+                    </div>
+                @endforelse
+
             </div>
 
         </div>
