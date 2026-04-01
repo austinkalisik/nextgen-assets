@@ -29,7 +29,7 @@ class Item extends Model
 
     /**
      * =============================
-     * DEFAULT VALUES (🔥 IMPORTANT)
+     * DEFAULT VALUES ( IMPORTANT)
      * =============================
      */
     protected $attributes = [
@@ -60,7 +60,41 @@ class Item extends Model
 
     /**
      * =============================
-     * STATUS LABEL (🔥 UI HELPER)
+     * ASSIGNMENTS (REAL SYSTEM)
+     * =============================
+     */
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
+    public function activeAssignment()
+    {
+        return $this->hasOne(Assignment::class)
+            ->whereNull('returned_at');
+    }
+
+    /**
+     * =============================
+     * 🔥 ADD THIS (IMPORTANT)
+     * GET CURRENT ASSIGNED USER
+     * =============================
+     */
+    public function assignedUser()
+    {
+        return $this->hasOneThrough(
+            User::class,
+            Assignment::class,
+            'item_id',   // Foreign key on assignments
+            'id',        // Foreign key on users
+            'id',        // Local key on items
+            'user_id'    // Local key on assignments
+        )->whereNull('assignments.returned_at');
+    }
+
+    /**
+     * =============================
+     * STATUS LABEL ( UI HELPER)
      * =============================
      */
     public function getStatusLabelAttribute()

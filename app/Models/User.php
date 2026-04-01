@@ -12,13 +12,34 @@ class User extends Authenticatable
 
     /**
      * =============================
-     * MASS ASSIGNABLE FIELDS
+     * RELATIONSHIPS
      * =============================
      */
-    public function assignment()
+
+    // 🔥 FIX: plural (hasMany)
+    public function assignments()
     {
         return $this->hasMany(Assignment::class);
     }
+
+    // 🔥 ADD: items through assignments
+    public function assignedItems()
+    {
+        return $this->hasManyThrough(
+            Item::class,
+            Assignment::class,
+            'user_id', // FK on assignments
+            'id',      // FK on items
+            'id',      // local key users
+            'item_id'  // local key assignments
+        );
+    }
+
+    /**
+     * =============================
+     * MASS ASSIGNABLE FIELDS
+     * =============================
+     */
     protected $fillable = [
         'name',
         'email',
@@ -32,7 +53,7 @@ class User extends Authenticatable
      * =============================
      */
     protected $attributes = [
-        'role' => 'user', // default role
+        'role' => 'user',
     ];
 
     /**

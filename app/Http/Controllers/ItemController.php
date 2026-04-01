@@ -9,14 +9,15 @@ use App\Models\User;
 use App\Models\AssetLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Assignment;
 
 class ItemController extends Controller
-{
+{   
     public function index(Request $request)
     {
         $search = $request->input('search');
 
-        $query = Item::with(['category', 'supplier']);
+        $query = Item::with(['category', 'supplier', 'activeAssignment.user']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -27,9 +28,8 @@ class ItemController extends Controller
             });
         }
 
-        $items = $query->latest()->paginate(10)
-                  ->withQueryString()
-                  ;
+        $items = $query->latest()->paginate(10)->withQueryString();
+
         $categories = Category::all();
         $suppliers = Supplier::all();
         $users = User::all();
@@ -46,11 +46,11 @@ class ItemController extends Controller
         ));
     }
        
-    //Create function
     public function create()
-       {
+    {
         return view('items-create');
-       }
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -86,17 +86,47 @@ class ItemController extends Controller
 
         $oldData = $item->toArray();
 
-        $assignedTo = $request->input('assigned_to');
-        $status = $request->input('status');
+        // =============================
+        //  FIXED ASSIGNMENT LOGIC
+        // =============================
+        $userId = $request->assigned_to;
 
-        if (!empty($assignedTo)) {
-            $status = 'assigned';
+        if ($request->filled('assigned_to')) {
+
+            // Close previous assignment
+            if ($item->activeAssignment) {
+                $item->activeAssignment->update([
+                    'returned_at' => now()
+                ]);
+            }
+
+            // Create new assignment
+            Assignment::create([
+                'item_id' => $item->id,
+                'user_id' => $userId,
+                'assigned_at' => now(),
+            ]);
+
+            // Keep compatibility
+            $item->update([
+                'status' => 'assigned',
+                'assigned_to' => $userId
+            ]);
+
+        } else {
+
+            // Unassign
+            if ($item->activeAssignment) {
+                $item->activeAssignment->update([
+                    'returned_at' => now()
+                ]);
+            }
+
+            $item->update([
+                'status' => 'available',
+                'assigned_to' => null
+            ]);
         }
-
-        $item->update([
-            'assigned_to' => $assignedTo,
-            'status' => $status,
-        ]);
 
         AssetLog::create([
             'item_id' => $item->id,
@@ -125,55 +155,49 @@ class ItemController extends Controller
         return redirect()->back()->with('success', 'Asset deleted successfully');
     }
 
-    //  CSV EXPORT (FIXED)
-    public function export()
-    {
-        $items = Item::with(['user','category','supplier'])->get();
+    // CSV EXPORT
+ public function export()
+{
+    $items = Item::with(['activeAssignment.user'])->get();
 
-        if ($items->isEmpty()) {
-            return redirect()->back()->with('error', 'No assets to export');
-        }
+    $filename = "assets.csv";
 
-        $filename = "assets_report_" . date('Y-m-d_H-i-s') . ".csv";
+    $headers = [
+        "Content-type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=$filename",
+        "Pragma" => "no-cache",
+        "Cache-Control" => "must-revalidate",
+        "Expires" => "0"
+    ];
 
-        $headers = [
-            "Content-Type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=\"$filename\"",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate",
-            "Expires" => "0",
-        ];
+    $callback = function () use ($items) {
+        $file = fopen('php://output', 'w');
 
-        $callback = function () use ($items) {
-            $file = fopen('php://output', 'w');
+        // HEADER
+        fputcsv($file, [
+            'Code',
+            'Brand',
+            'Name',
+            'Assigned To',
+            'Status'
+        ]);
+
+        foreach ($items as $item) {
+
+            $assignedUser = optional(optional($item->activeAssignment)->user)->name ?? '-';
 
             fputcsv($file, [
-                'Code',
-                'Brand',
-                'Name',
-                'Category',
-                'Supplier',
-                'Assigned To',
-                'Status',
-                'Created At'
+                $item->part_no,
+                $item->brand,
+                $item->part_name,
+                $assignedUser,
+                $item->status
             ]);
+        }
 
-            foreach ($items as $item) {
-                fputcsv($file, [
-                    $item->part_no,
-                    $item->brand,
-                    $item->part_name,
-                    optional($item->category)->name,
-                    optional($item->supplier)->name,
-                    $item->assigned_to ?? '-',
-                    strtoupper($item->status),
-                    $item->created_at,
-                ]);
-            }
+        fclose($file);
+    };
 
-            fclose($file);
-        };
-
-        return response()->streamDownload($callback, $filename, $headers);
-    }
+    return response()->stream($callback, 200, $headers);
+}
 }

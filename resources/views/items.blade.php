@@ -12,13 +12,11 @@
             <!-- RIGHT ACTIONS -->
             <div class="flex items-center gap-2">
 
-                <!--  ADD BUTTON (NEW) -->
                 <a href="{{ route('assets.create') }}"
                    class="px-5 py-2 text-sm font-medium text-white bg-green-600 shadow rounded-xl hover:bg-green-700">
                     + Add Asset
                 </a>
 
-                <!-- EXPORT BUTTON -->
                 <a href="{{ route('assets.export') }}"
                    class="px-5 py-2 text-sm font-medium text-white bg-blue-600 shadow rounded-xl hover:bg-blue-700">
                     Export CSV
@@ -27,7 +25,7 @@
             </div>
         </div>
 
-        <!-- TABLE CARD -->
+        <!-- TABLE -->
         <div class="overflow-hidden bg-white border shadow-lg rounded-2xl">
 
             <div class="flex items-center justify-between px-6 py-4 border-b bg-slate-50">
@@ -49,67 +47,101 @@
 
                 <tbody class="divide-y">
 
+                    
                     @foreach($items as $item)
-                        <tr class="transition hover:bg-slate-50">
+                                            <tr class="transition hover:bg-slate-50">
 
-                            <td class="px-6 py-4 font-medium">{{ $item->part_no }}</td>
-                            <td class="px-6 py-4">{{ $item->brand }}</td>
-                            <td class="px-6 py-4">{{ $item->part_name }}</td>
+                                                <td class="px-6 py-4 font-medium">{{ $item->part_no }}</td>
+                                                <td class="px-6 py-4">{{ $item->brand }}</td>
+                                                <td class="px-6 py-4">{{ $item->part_name }}</td>
 
-                            <td class="px-6 py-4 text-gray-500">
-                                {{ $item->user->name ?? '-' }}
-                            </td>
+                                                <!--  FIXED ASSIGNED -->
+                                                <td class="px-6 py-4 text-gray-500">
+                                                    {{ optional(optional($item->activeAssignment)->user)->name ?? '-' }}
+                                                </td>
 
-                            <!-- STATUS -->
-                            <td class="px-6 py-4">
-                                @php $status = $item->status ?? 'available'; @endphp
+                                                <!-- STATUS -->
+                                            <td class="px-6 py-4">
 
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                {{ $status == 'available' ? 'bg-green-100 text-green-700' : '' }}
-                                {{ $status == 'assigned' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                {{ $status == 'maintenance' ? 'bg-red-100 text-red-700' : '' }}">
-                                    {{ ucfirst($status) }}
-                                </span>
-                            </td>
+                                                @php
+                        $activeUser = optional(optional($item->activeAssignment)->user);
+                                                @endphp
 
-                            <!-- ACTIONS -->
-                            <td class="px-6 py-4">
+                                                <form method="POST" action="{{ route('assets.update', $item->id) }}" class="flex items-center gap-2">
+                                                    @csrf
+                                                    @method('PUT')
 
-                                <form method="POST" action="{{ route('assets.update', $item->id) }}"
-                                    class="flex items-center gap-2">
-                                    @csrf
-                                    @method('PUT')
+                                                    @if(!$activeUser)
+                                                        <!--  ASSIGN MODE -->
+                                                        <select name="assigned_to" class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                            <option value="">Select User</option>
+                                                            @foreach($users as $user)
+                                                                <option value="{{ $user->id }}">
+                                                                    {{ $user->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
 
-                                    <!-- USER -->
-                                    <select name="assigned_to"
-                                        class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        <option value="">Assign</option>
-                                        @foreach($users as $user)
-                                            <option value="{{ $user->id }}" {{ $item->assigned_to == $user->id ? 'selected' : '' }}>
-                                                {{ $user->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                                        <button class="px-3 py-1 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
+                                                            Assign
+                                                        </button>
 
-                                    <!-- STATUS -->
-                                    <select name="status"
-                                        class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                        <option value="available" {{ $item->status == 'available' ? 'selected' : '' }}>
-                                            Available</option>
-                                        <option value="assigned" {{ $item->status == 'assigned' ? 'selected' : '' }}>
-                                            Assigned</option>
-                                        <option value="maintenance" {{ $item->status == 'maintenance' ? 'selected' : '' }}>
-                                            Maintenance</option>
-                                    </select>
+                                                    @else
+                                                        <!--  RETURN MODE -->
+                                                        <span class="text-xs text-gray-500">
+                                                            {{ $activeUser->name }}
+                                                        </span>
 
-                                    <button class="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                                        Save
-                                    </button>
-                                </form>
+                                                        <input type="hidden" name="assigned_to" value="">
 
-                            </td>
+                                                        <button class="px-3 py-1 text-xs font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600">
+                                                            Return
+                                                        </button>
+                                                    @endif
 
-                        </tr>
+                                                </form>
+
+                                            </td>
+
+                                                <!-- ACTIONS -->
+                                                <td class="px-6 py-4">
+
+                                                    <form method="POST" action="{{ route('assets.update', $item->id) }}"
+                                                        class="flex items-center gap-2">
+                                                        @csrf
+                                                        @method('PUT')
+
+                                                        <!-- FIXED SELECT -->
+                                                        <select name="assigned_to"
+                                                            class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                            <option value="">Assign</option>
+                                                            @foreach($users as $user)
+                                                                <option value="{{ $user->id }}"
+                                                                    {{ optional(optional($item->activeAssignment)->user)->id == $user->id ? 'selected' : '' }}>
+                                                                    {{ $user->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                        <!-- STATUS -->
+                                          {{--             <select name="status"
+                                                            class="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                            <option value="available" {{ $item->status == 'available' ? 'selected' : '' }}>
+                                                                Available</option>
+                                                            <option value="assigned" {{ $item->status == 'assigned' ? 'selected' : '' }}>
+                                                                Assigned</option>
+                                                            <option value="maintenance" {{ $item->status == 'maintenance' ? 'selected' : '' }}>
+                                                                Maintenance</option>
+                                                        </select> --}}
+
+                                                        <button class="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                                                            Save
+                                                        </button>
+                                                    </form>
+
+                                                </td>
+
+                                            </tr>
                     @endforeach
 
                 </tbody>
