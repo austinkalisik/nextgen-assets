@@ -1,6 +1,33 @@
-#  NextGen Assets Inventory System
+#  NextGen Assets Management System
 
-A modern **Sales & Inventory Management System** built with Laravel.
+A modern **Asset Management System** built with Laravel to manage inventory, track assignments, and monitor system activity in real time.
+
+---
+
+##  System Overview
+
+NextGen Assets helps organizations:
+
+* Track assets (IT equipment, tools, devices)
+* Assign assets to users
+* Monitor asset lifecycle (created, assigned, returned)
+* Manage suppliers and categories
+* View real-time dashboard analytics
+
+---
+
+##  Core System Logic (ERD-Based)
+
+The system is structured around these relationships:
+
+* **Category (1) → (Many) Items**
+* **Supplier (1) → (Many) Items**
+* **Item (1) → (Many) Asset Logs**
+* **User (1) → (Many) Asset Logs**
+* **Item (1) → (Many) Assignments**
+* **User (1) → (Many) Assignments**
+
+ This ensures a **real asset tracking workflow**, not just static inventory.
 
 ---
 
@@ -8,18 +35,24 @@ A modern **Sales & Inventory Management System** built with Laravel.
 
 ###  Authentication
 
-* Login & Registration system
+* Login & Registration
 * Secure password hashing
 * Session-based authentication
 
+---
+
 ###  Dashboard
 
-* Total Assets overview
-* Total Brands tracking
-* Recently added assets
-* System summary panel
+* Total Assets
+* Available / Assigned / Maintenance
+* Low stock alerts
+* Monthly asset analytics
+* Real-time Port Moresby time
+* Recent asset activity
 
-###  Inventory Management
+---
+
+###  Asset Management
 
 * Add / Edit / Delete assets
 * Track:
@@ -30,105 +63,115 @@ A modern **Sales & Inventory Management System** built with Laravel.
   * Description
   * Category
   * Supplier
+  * Quantity
+  * Status
 
-###  Suppliers
+---
 
-* Add / Delete suppliers
-* Link suppliers to products
+###  Asset Assignment (Core Feature)
 
-###  Users
+* Assign assets to users
+* Track active assignments
+* Track returned assets (via `returned_at`)
+* Maintain assignment history
 
-* Manage users
-* Edit & delete accounts
+---
 
 ###  Categories
 
-* Organize inventory
-* Assign categories to items
+* Create categories
+* Search & filter categories
+* Organize assets logically
+
+---
+
+###  Suppliers
+
+* Add / Edit / Delete suppliers
+* Link suppliers to assets
+
+---
+
+###  Users
+
+* Manage system users
+* Assign assets to users
+* Role support (Admin / User)
+
+---
+
+###  Activity Logs
+
+* Track asset actions:
+
+  * Created
+  * Updated
+  * Assigned
+  * Deleted
+* Full audit trail for accountability
+
+---
 
 ###  Settings
 
-* Dynamic system name
-* Admin email configuration
-* Global system control
+* System name configuration
+* Admin email settings
 
-###  Reports
+---
 
-* System analytics overview
+###  Reports (In Progress)
+
+* CSV export (partially implemented)
+* Analytics dashboard
 
 ---
 
 ##  Tech Stack
 
-* Laravel (PHP Framework)
-* MySQL (XAMPP / phpMyAdmin)
-* Blade (Templating)
+* Laravel (Backend)
+* MySQL (Database)
+* Blade (Frontend)
 * Tailwind CSS (UI)
 
 ---
 
-##  Installation Guide (Step-by-Step)
+##  Installation
 
-### 1️ Clone Repository
+### 1. Clone Repository
 
 ```bash
 git clone https://github.com/austinkalisik/nextgen-assets.git
 cd backend
 ```
 
----
-
-### 2️ Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 composer install
 ```
 
----
-
-### 3️ Setup Environment
+### 3. Setup Environment
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
----
-
-### 4️ Configure Database (XAMPP)
-
-Open `.env` and update:
+### 4. Configure Database
 
 ```env
-DB_CONNECTION=mysql
 DB_DATABASE=nextgen_assets
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
- Then create database in phpMyAdmin:
-
-```
-nextgen_assets
-```
-
----
-
-### 5️ Run Migrations + Seeders
+### 5. Run Migrations + Seeders
 
 ```bash
 php artisan migrate:fresh --seed
 ```
 
- This will:
-
-* Create tables
-* Insert demo data
-* Create admin user
-
----
-
-### 6️ Start Server
+### 6. Start Server
 
 ```bash
 php artisan serve
@@ -153,40 +196,41 @@ Password: password
 
 ##  Project Structure
 
-* Controllers → `app/Http/Controllers`
-* Models → `app/Models`
-* Views → `resources/views`
-* Routes → `routes/web.php`
-* Database → `database/migrations`
-* Seeders → `database/seeders`
+| Layer       | Location             |
+| ----------- | -------------------- |
+| Controllers | app/Http/Controllers |
+| Models      | app/Models           |
+| Views       | resources/views      |
+| Routes      | routes/web.php       |
+| Database    | database/migrations  |
+| Seeders     | database/seeders     |
 
 ---
 
-##  Notes
+##  Current Limitations
 
-* Uses MySQL (XAMPP)
-* Fully dynamic system name (Settings module)
-* Clean modular structure
-* Ready for production upgrade
+* CSV export not fully working
+* Assignment UI not fully implemented
+* Some features still rely on `status` instead of assignments
 
 ---
 
 ##  Future Improvements
 
-* Role-based access (Admin/User)
-* Sales & Payments module
-* PDF & CSV reports
-* Charts & analytics dashboard
+* Full assignment workflow (assign → return)
+* CSV & PDF reporting
+* Role-based permissions
+* Notifications system
+* Advanced analytics dashboard
 
 ---
 
-Developer
+##
 
-Austin
 NextGen Assets System
 
 ---
 
-License
+##  License
 
 MIT License
