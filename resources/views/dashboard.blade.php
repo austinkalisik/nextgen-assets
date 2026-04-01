@@ -89,7 +89,7 @@
 
             <div class="p-6 text-white bg-red-500 shadow rounded-xl">
                 <p class="text-sm">Maintenance    </p>
-                <h2 class="text-3xl font-bold">{{ $maintenanceAssets }}</h2>
+                <h2 class="text-3xl font-bold">{{ $maintenanceAssets}}</h2>
             </div>
 
         </div>

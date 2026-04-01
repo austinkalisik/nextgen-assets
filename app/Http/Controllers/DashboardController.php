@@ -49,7 +49,7 @@ class DashboardController extends Controller
 
        // OPTIONAL (KEEP MAINTENANCE IF YOU STILL USE IT)
        
-       $maintenanceAssets = Item::where('status', 'maintenance');
+       $maintenanceAssets = Item::where('status', 'maintenance')->count();
         // =============================
         // LOW STOCK ALERT ( CORPORATE)
         // =============================
