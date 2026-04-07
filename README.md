@@ -96,9 +96,38 @@ php artisan serve
 ##  Default Login
 
 ```
-Email: admin@nextgen.com
-Password: password
+
 ```
+## Default Login Accounts
+
+After running:
+
+php artisan migrate:fresh --seed
+
+Use any of the following accounts:
+
+Admin:
+Email: admin@nextgen.local
+Password: password
+
+Asset Officer:
+Email: assets@nextgen.local
+Password: password
+
+ICT Support:
+Email: support@nextgen.local
+Password: password
+
+Manager:
+Email: operations@nextgen.local
+Password: password
+
+---
+
+ Note:
+If login fails, ensure you have seeded the database:
+
+php artisan migrate:fresh --seed
 
 ---
 
