@@ -76,7 +76,7 @@ class DashboardController extends Controller
 
     protected function userWorkspace(User $user): View
     {
-        $myActiveAssignments = Assignment::with(['item', 'department'])
+        $myActiveAssignments = Assignment::with(['item', 'assignedDepartment'])
             ->where('user_id', $user->id)
             ->whereNull('returned_at')
             ->latest('assigned_at')
@@ -88,7 +88,7 @@ class DashboardController extends Controller
 
             'myActiveAssignments' => $myActiveAssignments,
 
-            'myAssignmentHistory' => Assignment::with(['item', 'department'])
+            'myAssignmentHistory' => Assignment::with(['item', 'assignedDepartment'])
                 ->where('user_id', $user->id)
                 ->latest('assigned_at')
                 ->take(10)
